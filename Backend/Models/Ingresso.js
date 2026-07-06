@@ -1,0 +1,1 @@
+// Modelo Sequelize de Ingresso
