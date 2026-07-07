@@ -1,3 +1,6 @@
+import "../Models/Evento.js";
+import "../Models/Ingresso.js";
+import "../Models/Usuario.js";
 import Evento from "../Models/Evento.js";
 import Ingresso from "../Models/Ingresso.js";
 import { Ingresso_usuario, Usuario } from "../Models/Usuario.js";
