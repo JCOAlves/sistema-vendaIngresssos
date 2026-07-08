@@ -15,18 +15,18 @@ CREATE TABLE Evento(
     horaFim TIME NOT NULL,  
     limiteIngressos INT,  
     localEvento VARCHAR(120) NOT NULL,  
-    ingresso_pessoa INT NOT NULL DEFAULT '1'
+    ingresso_pessoa INT NOT NULL DEFAULT 1
 );
 
 CREATE TABLE Ingresso(
     ID_ingresso INT PRIMARY KEY AUTO_INCREMENT,  
     ID_evento INT NOT NULL,
-    FOREIGN KEY(ID_evento) REFERENCES Evento (ID_evento)
-    precoIngresso DECIMAL(10,2) NOT NULL DEFAULT '0'
+    FOREIGN KEY(ID_evento) REFERENCES Evento (ID_evento),
+    precoIngresso DECIMAL(10,2) NOT NULL DEFAULT 0
 );
 
 CREATE TABLE Usuario(
-    CPF VARCHAR(12) PRIMARY KEY,  
+    CPF VARCHAR(14) PRIMARY KEY,  
     nomeUsuario VARCHAR(100) NOT NULL,  
     dataNascimento DATE NOT NULL,  
     emailUsuario VARCHAR(100) NOT NULL
@@ -36,10 +36,10 @@ CREATE TABLE Ingresso_usuario(
     ID_relacionamento INT PRIMARY KEY AUTO_INCREMENT,  
     ID_ingresso INT NOT NULL,
     FOREIGN KEY(ID_ingresso) REFERENCES Ingresso (ID_ingresso),
-    CPF VARCHAR(12) NOT NULL,
+    CPF VARCHAR(14) NOT NULL,
     FOREIGN KEY(CPF) REFERENCES Usuario (CPF),
-    quantidadeIngresso INT NOT NULL DEFAULT '1',  
+    quantidadeIngresso INT NOT NULL DEFAULT 1,  
     valorPago DECIMAL(12,2) NOT NULL,  
     formaPagamento ENUM("Dinheiro em espécie", "Cartão de Crédito", "Cartão de Debito", "Pix") NOT NULL,  
-    dataCompra DATETIME NOT NULL DEFAULT current_timestamp
+    dataCompra DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
