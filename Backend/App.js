@@ -14,6 +14,10 @@ SincronizacaoBD();
 
 App.use(express.json());
 
+App.get("/", (req, res) => {
+    res.status(200).send(`<h1 style='text-align: center;'>Servidor Web</h1>`);
+});
+
 App.use("/eventos", EventosRouter);
 App.use("/ingressos", IngressosRouter);
 App.use("/usuarios", UsuariosRouter);
