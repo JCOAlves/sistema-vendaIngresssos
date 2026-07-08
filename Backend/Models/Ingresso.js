@@ -12,7 +12,7 @@ const Ingresso = ConectionBD.define("Ingresso", {
     }
 
 },
-    { 
+    {
         freezeTableName: true,
         timestamps: false
     }

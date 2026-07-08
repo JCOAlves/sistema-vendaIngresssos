@@ -3,7 +3,7 @@ import RespostaHTTP from "../Config/RespostaHTTP.js";
 
 const listaEventos = async (req, res) => {
     try {
-        const { filtro, tipoFiltro = "" } = req.query;
+        const { filtro, tipoFiltro = "" } = req.query; // Filtros de listagem
 
         let lista_eventos = await Evento.findAll({ order: [["dataInicio", "DESC"], ["horaInicio", "ASC"]] });
 
@@ -24,7 +24,7 @@ const listaEventos = async (req, res) => {
 
         } else {
             const Resposta = new RespostaHTTP(false, "Não há eventos cadastrados ou eventos não encontrados");
-            Resposta.ExibeMensagem();
+            Resposta.ExibeMensagem("Erro");
             return res.status(404).json(Resposta);
         };
 
@@ -128,7 +128,7 @@ const cadastraEvento = async (req, res) => {
         };
 
         const EventoCadastrado = await Evento.create(dadosEvento);
-        if(EventoCadastrado){
+        if (EventoCadastrado) {
             const Resposta = new RespostaHTTP(true, "Novo evento cadastrado com sucesso", null, EventoCadastrado);
             Resposta.ExibeMensagem();
             return res.status(201).json(Resposta);
@@ -160,21 +160,21 @@ const atualizaEvento = async (req, res) => {
         }
 
         let dadosNovos = {};
-        if(nomeEvento && nomeEvento != EventoID.dataValues.nomeEvento) dadosNovos.nomeEvento = nomeEvento;
-        if(localEvento && localEvento != EventoID.dataValues.localEvento) dadosNovos.localEvento = localEvento;
-        if(dataInicio && dataInicio != EventoID.dataValues.dataInicio) dadosNovos.dataInicio = dataInicio;
-        if(dataFim && dataFim != EventoID.dataValues.dataFim) dadosNovos.dataFim = dataFim;
-        if(horaInicio && horaInicio != EventoID.dataValues.horaInicio) dadosNovos.horaInicio = horaInicio;
-        if(horaFim && horaFim != EventoID.dataValues.horaFim) dadosNovos.horaFim = horaFim;
-        if(limiteIngressos && limiteIngressos != EventoID.dataValues.limiteIngressos) dadosNovos.limiteIngressos = limiteIngressos;
-        if(ingressos_pessoas && ingressos_pessoas != EventoID.dataValues.ingressos_pessoas) dadosNovos.ingressos_pessoas = ingressos_pessoas;
+        if (nomeEvento && nomeEvento != EventoID.dataValues.nomeEvento) dadosNovos.nomeEvento = nomeEvento;
+        if (localEvento && localEvento != EventoID.dataValues.localEvento) dadosNovos.localEvento = localEvento;
+        if (dataInicio && dataInicio != EventoID.dataValues.dataInicio) dadosNovos.dataInicio = dataInicio;
+        if (dataFim && dataFim != EventoID.dataValues.dataFim) dadosNovos.dataFim = dataFim;
+        if (horaInicio && horaInicio != EventoID.dataValues.horaInicio) dadosNovos.horaInicio = horaInicio;
+        if (horaFim && horaFim != EventoID.dataValues.horaFim) dadosNovos.horaFim = horaFim;
+        if (limiteIngressos && limiteIngressos != EventoID.dataValues.limiteIngressos) dadosNovos.limiteIngressos = limiteIngressos;
+        if (ingressos_pessoas && ingressos_pessoas != EventoID.dataValues.ingressos_pessoas) dadosNovos.ingressos_pessoas = ingressos_pessoas;
 
         await EventoID.update(dadosNovos);
 
         const Resposta = new RespostaHTTP(true, "Dados de evento atualizados com sucesso", null);
         Resposta.ExibeMensagem();
         return res.status(200).json(Resposta);
-        
+
 
     } catch (error) {
         const Resposta = new RespostaHTTP(false, "Erro na atualização de dados de evento", error.message || error);
