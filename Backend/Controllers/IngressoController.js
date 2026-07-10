@@ -1,5 +1,6 @@
 import Ingresso from "../Models/Ingresso.js";
 import Evento from "../Models/Evento.js";
+import { Usuario, Ingresso_usuario } from "../Models/Usuario.js";
 import RespostaHTTP from "../Config/RespostaHTTP.js";
 
 const listaIngressos = async (req, res) => {
@@ -91,16 +92,16 @@ const cadastraIngresso = async (req, res) => {
             return res.status(400).json(Resposta);
         };
 
-        const dadosIngresso = {
-            ID_evento: ID_evento,
-            precoIngresso: precoIngresso
-        };
-
-        const lista_ingressos = await Ingresso.findAll();
-        if (EventoID.dataValues.limiteIngressos != lista_ingressos.length) {
+        const lista_ingressos = await Ingresso.findAll({ where: { ID_evento: ID_evento } });
+        if (EventoID.dataValues.limiteIngressos === lista_ingressos.length) {
             const Resposta = new RespostaHTTP(false, "Número limite de criação de ingressos já ultrapassado");
             Resposta.ExibeMensagem("Erro");
             return res.status(401).json(Resposta);
+        };
+
+        const dadosIngresso = {
+            ID_evento: ID_evento,
+            precoIngresso: precoIngresso
         };
 
         const IngressoCadastrado = await Ingresso.create(dadosIngresso);
@@ -186,4 +187,83 @@ const deletaIngresso = async (req, res) => {
     };
 };
 
-export { listaIngressos, listaIngressoID, cadastraIngresso, atualizaIngresso, deletaIngresso };
+// Compra de ingresso
+const compraIngresso = async (req, res) => {
+    try {
+        const { ID_ingresso, CPF, quantidadeIngresso, valorPago, formaPagamento } = req.body;
+
+        if(!ID_ingresso){
+            const Resposta = new RespostaHTTP(false, "ID de ingresso não fornecido ou invalido");
+            Resposta.ExibeMensagem("Erro");
+            return res.status(400).json(Resposta);
+        };
+
+        const IngressoID = await Ingresso.findByPk(ID_ingresso);
+        if (!IngressoID) {
+            const Resposta = new RespostaHTTP(false, "Não há cadastrado ingresso relacionado ao ID ou ingresso não encontrado");
+            Resposta.ExibeMensagem("Erro");
+            return res.status(404).json(Resposta);
+        };
+
+        if (!CPF) {
+            const Resposta = new RespostaHTTP(false, "CPF de usuário não fornecido ou invalido");
+            Resposta.ExibeMensagem("Erro");
+            return res.status(400).json(Resposta);
+        };
+
+        const UsuarioID = await Usuario.findByPk(CPF);
+        if (!UsuarioID) {
+            const Resposta = new RespostaHTTP(false, "Não há cadastrado usuário relacionado ao ID ou usuário não encontrado");
+            Resposta.ExibeMensagem("Erro");
+            return res.status(404).json(Resposta);
+        };
+
+        if(!quantidadeIngresso){
+            const Resposta = new RespostaHTTP(false, "Quantidade de ingressos comprados não fornecido ou invalido");
+            Resposta.ExibeMensagem("Erro");
+            return res.status(400).json(Resposta);
+        };
+
+        if(!valorPago){
+            const Resposta = new RespostaHTTP(false, "Valor pago por ingresso não fornecido ou invalido");
+            Resposta.ExibeMensagem("Erro");
+            return res.status(400).json(Resposta);
+        };
+
+        if(!formaPagamento || !["Dinheiro em espécie", "Cartão de Crédito", "Cartão de Debito", "Pix"].includes(formaPagamento)){
+            const Resposta = new RespostaHTTP(false, "Forma de pagamento de ingresso não fornecido ou invalido");
+            Resposta.ExibeMensagem("Erro");
+            return res.status(400).json(Resposta);
+        };
+
+        const EventoID = await Evento.findByPk(IngressoID.dataValues.ID_evento);
+        if(EventoID.dataValues.ingressos_pessoas < quantidadeIngresso){
+            const Resposta = new RespostaHTTP(false, "Quantidade de compra de ingressos maior que a permitida");
+            Resposta.ExibeMensagem("Erro");
+            return res.status(401).json(Resposta);
+        };
+
+        const dadosCompra = {
+            quantidadeIngresso: quantidadeIngresso,
+            valorPago: valorPago,
+            formaPagamento: formaPagamento, 
+            ID_ingresso: ID_ingresso,
+            CPF: CPF
+        };
+
+        const CompraCadastrada = await Ingresso_usuario.create(dadosCompra);
+        if(CompraCadastrada){
+            const Resposta = new RespostaHTTP(true, "Compra de ingresso cadastrado com sucesso", null, CompraCadastrada);
+            Resposta.ExibeMensagem();
+            return res.status(201).json(Resposta);
+        }
+
+        
+    } catch (error) {
+        const Resposta = new RespostaHTTP(false, "Erro no registro de compra de ingresso", error.message || error);
+        Resposta.ExibeMensagem("Erro");
+        return res.status(500).json(Resposta);
+    };
+};
+
+export { listaIngressos, listaIngressoID, cadastraIngresso, atualizaIngresso, deletaIngresso, compraIngresso };

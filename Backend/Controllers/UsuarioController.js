@@ -1,5 +1,4 @@
 import { Usuario, Ingresso_usuario } from "../Models/Usuario.js";
-import Evento from "../Models/Evento.js";
 import Ingresso from "../Models/Ingresso.js";
 import RespostaHTTP from "../Config/RespostaHTTP.js";
 
@@ -186,7 +185,21 @@ const deletaUsuario = async (req, res) => {
 // Função de listagem de usuários e ingresos
 const listaUsuarios_ingressos = async (req, res) => {
     try {
-        // ...
+        const usuarios_ingressos = await Ingresso_usuario.findAll({
+            include: [ { model: Usuario }, { model: Ingresso } ],
+            order: [["CPF", "ASC"]]
+        });
+
+        if(usuarios_ingressos.length > 0){
+            const Resposta = new RespostaHTTP(true, "Usuários e ingressos listados com sucesso", null, usuarios_ingressos);
+            Resposta.ExibeMensagem();
+            return res.status(200).json(Resposta);
+
+        } else{
+            const Resposta = new RespostaHTTP(false, "Não há cadastrada a relação de usuários e ingressos ou relação não encontrada");
+            Resposta.ExibeMensagem();
+            return res.status(404).json(Resposta);
+        };
         
     } catch (error) {
         const Resposta = new RespostaHTTP(false, "Erro na listagem de ingressos e usuários", error.message || error);
@@ -198,8 +211,33 @@ const listaUsuarios_ingressos = async (req, res) => {
 // Função de listagem de ingressos de usuário
 const listaUsuario_ingressos = async (req, res) => {
     try {
-        // ...
+        const { ID_usuario } = req.params;
+
+        if(!ID_usuario){
+            const Resposta = new RespostaHTTP(false, "ID de usuário não fornecido ou invalido");
+            Resposta.ExibeMensagem("Erro");
+            return res.status(400).json(Resposta);
+        };
+
+        const UsuarioID = await Usuario.findByPk(ID_usuario);
+        if (!UsuarioID) {
+            const Resposta = new RespostaHTTP(false, "Não há cadastrado usuário relacionado ao ID ou usuário não encontrado");
+            Resposta.ExibeMensagem("Erro");
+            return res.status(404).json(Resposta);
+        };
         
+        const usuario_ingressos = await Ingresso_usuario.findAll({ where: { CPF: ID_usuario } });
+        if(usuario_ingressos.length > 0){
+            const Resposta = new RespostaHTTP(true, "Ingressos de usuário listados com sucesso", null, usuario_ingressos);
+            Resposta.ExibeMensagem();
+            return res.status(200).json(Resposta);
+
+        } else{
+            const Resposta = new RespostaHTTP(false, "Não há cadastrado ingressos de usuário ou não ingressos de usuário encontrado");
+            Resposta.ExibeMensagem();
+            return res.status(404).json(Resposta);
+        };
+
     } catch (error) {
         const Resposta = new RespostaHTTP(false, "Erro na listagem de ingressos de usuário", error.message || error);
         Resposta.ExibeMensagem("Erro");
@@ -207,4 +245,5 @@ const listaUsuario_ingressos = async (req, res) => {
     };
 };
 
-export { listaUsuarios, listaUsuarioID, cadastraUsuario, atualizaUsuario, deletaUsuario };
+
+export { listaUsuarios, listaUsuarioID, cadastraUsuario, atualizaUsuario, deletaUsuario, listaUsuarios_ingressos, listaUsuario_ingressos };
