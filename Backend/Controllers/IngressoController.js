@@ -174,7 +174,7 @@ const deletaIngresso = async (req, res) => {
 
         await IngressoID.destroy();
 
-        const Resposta = new RespostaHTTP(true, "Ingresso excluiso do sistema com sucesso", null);
+        const Resposta = new RespostaHTTP(true, "Ingresso excluido do sistema com sucesso", null);
         Resposta.ExibeMensagem();
         return res.status(200).json(Resposta);
 

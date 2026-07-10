@@ -202,7 +202,7 @@ const deletaEvento = async (req, res) => {
 
         await EventoID.destroy();
 
-        const Resposta = new RespostaHTTP(true, "Evento excluiso do sistema com sucesso", null);
+        const Resposta = new RespostaHTTP(true, "Evento excluido do sistema com sucesso", null);
         Resposta.ExibeMensagem();
         return res.status(200).json(Resposta);
 
